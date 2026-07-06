@@ -6,21 +6,32 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.majasociet.nafusitemobileapp.features.auth.data.models.BasicRegistrationInfo
 import com.majasociet.nafusitemobileapp.features.auth.ui.components.AuthOnboardingScaffold
+import com.majasociet.nafusitemobileapp.features.auth.ui.viewmodel.AuthViewModel
+import com.majasociet.nafusitemobileapp.features.auth.ui.viewmodel.UIEvent
 import com.majasociet.nafusitemobileapp.shared.components.PasswordTextField
 import com.majasociet.nafusitemobileapp.shared.components.PasswordValidationBox
+import com.majasociet.nafusitemobileapp.shared.utils.ToastUtils
 import com.majasociet.nafusitemobileapp.shared.utils.ValidationUtils
 import com.majasociet.nafusitemobileapp.ui.theme.AppTheme
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun PasswordSetupScreen(
-    navigateHome: () -> Unit
-){
+    basicInfo: BasicRegistrationInfo,
+    selectedPreferences: List<String>,
+    authViewModel: AuthViewModel,
+    navigateLogin: () -> Unit
+) {
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
 
@@ -31,10 +42,43 @@ fun PasswordSetupScreen(
             && password == confirmPassword
             && confirmPassword.isNotEmpty()
 
+    val authState = authViewModel.authState.collectAsStateWithLifecycle().value
+
+
+    fun submitPassword(){
+        authViewModel.registerUser(
+            email = basicInfo.email,
+            password = password,
+            firstName = basicInfo.firstName,
+            lastName = basicInfo.lastName,
+            dateOfBirth = basicInfo.dateOfBirth,
+            selectedPreferences = selectedPreferences,
+        )
+    }
+    val context = LocalContext.current
+
+    LaunchedEffect(
+        authViewModel.uiEvent
+    ) {
+        authViewModel.uiEvent.collectLatest { event ->
+            when(event) {
+                is UIEvent.SubmitRegistrationSuccess ->{
+                    navigateLogin()
+                }
+                is UIEvent.SubmitRegistrationFailure ->{
+                    ToastUtils.show(context,event.message)
+                }
+                else -> {}
+            }
+        }
+
+    }
+
 
     AuthOnboardingScaffold(
         currentStep = 3,
-        bottomAction = navigateHome,
+        bottomAction = { submitPassword() },
+        isButtonLoading = authState.isLoading,
         canProceed = isFormValid,
         content = {
             Column(
@@ -47,19 +91,19 @@ fun PasswordSetupScreen(
                     "Complete your signup by creating a password",
                     style = MaterialTheme.typography.titleMedium
                 )
-                Spacer(modifier =  Modifier.padding(AppTheme.spacing.small))
+                Spacer(modifier = Modifier.padding(AppTheme.spacing.small))
                 PasswordTextField(
-                    value =  password,
+                    value = password,
                     onValueChange = {
-                        password  = it
+                        password = it
                     },
                     placeholder = "New password",
                     error = passwordError
                 )
                 PasswordTextField(
-                    value =  confirmPassword,
+                    value = confirmPassword,
                     onValueChange = {
-                        confirmPassword  = it
+                        confirmPassword = it
                     },
                     placeholder = "Confirm new password",
                     error = confirmPasswordError

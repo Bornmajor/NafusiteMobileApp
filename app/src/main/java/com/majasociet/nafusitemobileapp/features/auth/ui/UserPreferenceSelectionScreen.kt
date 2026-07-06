@@ -18,7 +18,7 @@ import com.majasociet.nafusitemobileapp.ui.theme.AppTheme
 
 @Composable
 fun UserPreferenceSelectionScreen(
-    navigatePasswordSetup: () -> Unit
+    onPreferenceConfirm:(List<String>) -> Unit
 ){
     // List of catalog choices to feed into the component
     val productCategories = remember {
@@ -29,7 +29,7 @@ fun UserPreferenceSelectionScreen(
 
     AuthOnboardingScaffold(
         currentStep = 2,
-        bottomAction = navigatePasswordSetup,
+        bottomAction = { onPreferenceConfirm(selectedCategories.toList()) },
         canProceed = selectedCategories.isNotEmpty(),
         content = {
             Column(

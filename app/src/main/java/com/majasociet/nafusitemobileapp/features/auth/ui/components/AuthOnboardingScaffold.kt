@@ -2,9 +2,12 @@ package com.majasociet.nafusitemobileapp.features.auth.ui.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -24,15 +27,17 @@ fun AuthOnboardingScaffold(
     bottomAction: () -> Unit,
     content: @Composable () -> Unit,
     canProceed: Boolean = false,
+    isButtonLoading: Boolean = false,
     currentStep: Int
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         bottomBar = {
             Box(
-                modifier = Modifier.padding(AppTheme.spacing.medium)
+                modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars).padding(AppTheme.spacing.medium)
             ){
                 AppButton(
+                    isLoading = isButtonLoading,
                     modifier = Modifier.fillMaxWidth(),
                     text = "Next",
                     onClick = bottomAction,
