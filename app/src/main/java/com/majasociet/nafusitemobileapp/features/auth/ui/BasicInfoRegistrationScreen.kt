@@ -11,6 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.majasociet.nafusitemobileapp.features.auth.data.models.BasicRegistrationInfo
 import com.majasociet.nafusitemobileapp.features.auth.ui.components.AuthOnboardingScaffold
 import com.majasociet.nafusitemobileapp.shared.components.AppDatePicker
 import com.majasociet.nafusitemobileapp.shared.components.CustomTextField
@@ -19,8 +20,9 @@ import com.majasociet.nafusitemobileapp.ui.theme.AppTheme
 
 @Composable
 fun BasicInfoRegistrationScreen(
-    navigateUserPreferenceSelection: () -> Unit
+    onNextClick:(BasicRegistrationInfo) -> Unit,
 ) {
+    //TODO -refactor composable state to custom state class holder for composable with more than 4 states.
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -61,7 +63,13 @@ fun BasicInfoRegistrationScreen(
 
         // 3. Only proceed forward if both criteria are cleanly met
         if (isEmailValid && isAgeValid) {
-            navigateUserPreferenceSelection()
+           val basicInfo = BasicRegistrationInfo(
+                firstName = firstName,
+                lastName = lastName,
+                email = email,
+                dateOfBirth = dateOfBirth
+            )
+            onNextClick(basicInfo)
         }
     }
 

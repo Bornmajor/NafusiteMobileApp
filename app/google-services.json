@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "343064234524",
+    "project_id": "general-project-app-5272d",
+    "storage_bucket": "general-project-app-5272d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:343064234524:android:4e43abb0ed08d5ed88edd9",
+        "android_client_info": {
+          "package_name": "com.example.practise_build_automation_firebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1ZoUvgUYhKIgmbnBoyq_d78nHUyAMddU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:343064234524:android:03a87e12ea541b0588edd9",
+        "android_client_info": {
+          "package_name": "com.majasociet.nafusitemobileapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1ZoUvgUYhKIgmbnBoyq_d78nHUyAMddU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:343064234524:android:cc0a1b2e74e657d088edd9",
+        "android_client_info": {
+          "package_name": "com.majasociet.practise_build_automation_firebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1ZoUvgUYhKIgmbnBoyq_d78nHUyAMddU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

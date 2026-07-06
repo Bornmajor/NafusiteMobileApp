@@ -1,17 +1,42 @@
+// File path: com/majasociet/nafusitemobileapp/navigation/Screen.kt
 package com.majasociet.nafusitemobileapp.navigation
 
-sealed class Screen(val route: String) {
+import com.majasociet.nafusitemobileapp.features.auth.data.models.BasicRegistrationInfo
+import kotlinx.serialization.Serializable
 
-    //Registration screens
-    object RegistrationGraph : Screen("registration_graph")
-    object AppSplashScreen : Screen("app_splash_screen")
-    object WelcomeRegistrationScreen : Screen("welcome_registration_screen")
-    object BasicInfoRegistrationScreen : Screen("basic_info_registration_screen")
-    object UserPreferenceSelectionScreen : Screen("user_preference_selection_screen")
-    object PasswordSetupScreen : Screen("password_setup_screen")
+// Sub-graphs are now represented as simple serializable data structures
+@Serializable
+object RegistrationGraph
+@Serializable
+object HomeGraph
+@Serializable
+object ProfileGraph
+sealed class Screen {
+    @Serializable
+    object AppSplashScreen
+    @Serializable
+    object WelcomeRegistrationScreen
+    @Serializable
+    object BasicInfoRegistrationScreen
+    @Serializable
+    data class UserPreferenceSelectionScreen(
+        val registrationInfo: BasicRegistrationInfo
+    )
 
-    // Home
-    object HomeGraph : Screen("home_graph")
-    object HomeScreen: Screen("home_screen")
+    @Serializable
+    data class PasswordSetupScreen(
+        val registrationInfo: BasicRegistrationInfo,
+        val selectedPreferences: List<String>
+    )
 
+    @Serializable
+    object LoginScreen
+    @Serializable
+    object HomeScreen
+
+    //Profile screens
+    @Serializable
+    object ProfileMainScreen
+    @Serializable
+    object UpdateProfileScreen
 }
