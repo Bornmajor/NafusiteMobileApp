@@ -32,7 +32,13 @@ fun NavGraphBuilder.profileGraph(
                 logout = {
                     authViewModel.logoutUser()
                 },
-                profileViewModel = profileViewModel
+                profileViewModel = profileViewModel,
+                navigateBack = {
+                    navController.popBackStack()
+                },
+                navigateToSearch = {
+                    navController.navigate(Screen.SearchScreen)
+                }
             )
         }
         composable<Screen.UpdateProfileScreen> {
@@ -40,6 +46,9 @@ fun NavGraphBuilder.profileGraph(
                 profileViewModel = profileViewModel,
                 navigateBack = {
                     navController.popBackStack()
+                },
+                navigateToSearch = {
+                    navController.navigate(Screen.SearchScreen)
                 }
             )
         }

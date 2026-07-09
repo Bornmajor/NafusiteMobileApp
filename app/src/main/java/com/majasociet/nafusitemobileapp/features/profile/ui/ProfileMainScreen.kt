@@ -34,11 +34,15 @@ import com.majasociet.nafusitemobileapp.ui.theme.AppTheme
 fun ProfileMainScreen(
     navigateEditProfile: () -> Unit,
     logout: () -> Unit,
-    profileViewModel: ProfileViewModel
+    profileViewModel: ProfileViewModel,
+    navigateBack: () -> Unit,
+    navigateToSearch: () -> Unit
 ) {
     val profileState = profileViewModel.profileState.collectAsStateWithLifecycle().value
     val user = profileState.user
     ProfileScaffold(
+        navigateBack = navigateBack,
+        navigateToSearch = navigateToSearch,
         content = {
             Column(
                 modifier = Modifier.fillMaxSize(),

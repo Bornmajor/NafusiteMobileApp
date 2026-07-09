@@ -16,7 +16,6 @@ import com.majasociet.nafusitemobileapp.features.auth.ui.login.LoginScreen
 import com.majasociet.nafusitemobileapp.features.auth.ui.viewmodel.AuthViewModel
 import com.majasociet.nafusitemobileapp.features.profile.ui.viewmodel.ProfileViewModel
 import com.majasociet.nafusitemobileapp.navigation.RegistrationGraph
-import com.majasociet.nafusitemobileapp.navigation.HomeGraph
 import com.majasociet.nafusitemobileapp.navigation.Screen
 import com.majasociet.nafusitemobileapp.navigation.CustomNavTypes
 import kotlin.reflect.typeOf
