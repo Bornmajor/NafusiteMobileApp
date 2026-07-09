@@ -2,39 +2,109 @@ package com.majasociet.nafusitemobileapp.features.home.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.majasociet.nafusitemobileapp.features.auth.ui.viewmodel.AuthViewModel
-import com.majasociet.nafusitemobileapp.shared.components.AppButton
+import com.majasociet.nafusitemobileapp.features.home.ui.components.CategoryGroup
+import com.majasociet.nafusitemobileapp.features.home.ui.components.HorizontalScrollableCategory
+import com.majasociet.nafusitemobileapp.features.products.data.models.Category
+import com.majasociet.nafusitemobileapp.features.products.data.models.Product
+import com.majasociet.nafusitemobileapp.features.products.ui.viewmodel.ProductsEvent
+import com.majasociet.nafusitemobileapp.features.products.ui.viewmodel.ProductsViewModel
+import com.majasociet.nafusitemobileapp.shared.components.AppLoaderUI
+import com.majasociet.nafusitemobileapp.shared.components.BottomTabScreenScaffold
+import com.majasociet.nafusitemobileapp.shared.components.ErrorMessage
+import com.majasociet.nafusitemobileapp.shared.constants.AppConstants
+import com.majasociet.nafusitemobileapp.shared.utils.ToastUtils
 import com.majasociet.nafusitemobileapp.ui.theme.AppTheme
+import kotlinx.coroutines.flow.collectLatest
+
+
 
 @Composable
 fun HomeScreen(
     authViewModel: AuthViewModel,
-    navigateToProfile: () -> Unit
+    navigateToProfile: () -> Unit,
+    navigateToSearch: () -> Unit,
+    navigateToCategory: (Category) -> Unit,
+    productsViewModel: ProductsViewModel
 ){
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ){
-        Text(text = "Home Screen")
-        AppButton(
-            text = "Go to profile",
-            onClick = navigateToProfile
-        )
-        Spacer(modifier = Modifier.padding(AppTheme.spacing.medium))
-        AppButton(
-            text = "Logout",
-            onClick = {
-                authViewModel.logoutUser()
+
+    val productsState = productsViewModel.productsState.collectAsStateWithLifecycle().value;
+
+//    LaunchedEffect(productsViewModel.productEvent) {
+//        productsViewModel.productEvent.collectLatest { event ->
+//            when (event) {
+//                is ProductsEvent.FailureFetchCategories -> {
+//                    // Handle failure
+//                    ToastUtils.show(context, event.message)
+//                }
+//                is ProductsEvent.FailureFetchProducts -> {
+//                    // Handle failure
+//                    ToastUtils.show(context, event.message)
+//                }
+//
+//                }
+//
+//            }
+//    }
+
+    BottomTabScreenScaffold(
+        navigateToProfile = navigateToProfile,
+        navigateToSearch = navigateToSearch,
+        content = {
+
+            if(productsState.isLoading){
+
+                AppLoaderUI(
+                    modifier = Modifier.fillMaxSize(),
+                    message = "Loading content..."
+                )
+            } else if(productsState.error != null){
+                ErrorMessage(
+                    modifier = Modifier.fillMaxSize(),
+                    message = productsState.error
+                )
+            } else {
+                LazyColumn (
+                    modifier = Modifier.fillMaxSize().padding(AppTheme.spacing.medium),
+                    verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+                ){
+                    item{
+                        HorizontalScrollableCategory(
+                            categories = productsState.categories,
+                            onSelectCategory = navigateToCategory
+                        )
+                    }
+
+                    items(productsState.categories){
+                            category ->
+                        CategoryGroup(
+                            title = category.title,
+                            products = productsState.products.filter { it.category == category.id },
+                            onSelectProduct = {
+                                //Navigate to product detail screen
+                            },
+                            onExpandCategory = {
+                                //Navigate to category screen
+                            }
+                        )
+                    }
+                }
             }
-        )
-    }
+
+        }
+    )
+
 
 }

@@ -33,7 +33,8 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun UpdateProfileScreen(
     profileViewModel: ProfileViewModel,
-    navigateBack: () -> Unit
+    navigateBack: () -> Unit,
+    navigateToSearch: () -> Unit
 ){
     val profileState = profileViewModel.profileState.collectAsStateWithLifecycle().value
     var firstName by remember { mutableStateOf(profileState.user?.firstName ?: "") }
@@ -75,6 +76,8 @@ fun UpdateProfileScreen(
 
 
     ProfileScaffold(
+        navigateBack = navigateBack,
+        navigateToSearch = navigateToSearch,
         bottomAction = {
             AppButton(
                 text = "Save",

@@ -1,51 +1,47 @@
-package com.majasociet.nafusitemobileapp.features.profile.ui.components
+package com.majasociet.nafusitemobileapp.shared.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.majasociet.nafusitemobileapp.R
-import com.majasociet.nafusitemobileapp.shared.components.AppButton
-import com.majasociet.nafusitemobileapp.shared.components.SegmentedStepper
-import com.majasociet.nafusitemobileapp.ui.theme.AppTheme
 
+
+/**
+ * This is the actual composable screen with the scaffold
+ */
 @Composable
-fun ProfileScaffold(
+fun BottomTabScreenScaffold(
+    navigateToProfile:() -> Unit,
+    navigateToSearch:() -> Unit,
     modifier: Modifier = Modifier,
-    bottomAction:(@Composable () -> Unit)?=null,
     content: @Composable () -> Unit,
-    navigateBack:() -> Unit,
-    navigateToSearch:() -> Unit
-) {
+){
     Scaffold(
-        modifier = modifier.fillMaxSize().safeDrawingPadding(),
         topBar = {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(
-                    onClick = navigateBack
-                ) {
+                        onClick = navigateToProfile
+                        ) {
                     Icon(
                         modifier= Modifier.size(30.dp),
-                        painter = painterResource(R.drawable.arrow_back_24px),
-                        contentDescription = "Go back"
+                        painter = painterResource(R.drawable.baseline_person_24),
+                        contentDescription = "Profile"
                     )
                 }
                 IconButton(
@@ -60,22 +56,14 @@ fun ProfileScaffold(
 
             }
         },
-        bottomBar = {
-            if(bottomAction != null){
-                Box(
-                    modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars).padding(AppTheme.spacing.medium)
-                ){
-                    bottomAction()
-                }
-            }
-        }
-    ){ innerPadding ->
-        Column(
-            modifier = Modifier.fillMaxSize()
-                .padding(innerPadding)
-                .padding(AppTheme.spacing.medium)
-        ) {
+        content = { innerPadding -> Box(
+            modifier = Modifier.padding(innerPadding).fillMaxSize()
+        ){
             content()
         }
-    }
+
+        }
+    )
+
 }
+
