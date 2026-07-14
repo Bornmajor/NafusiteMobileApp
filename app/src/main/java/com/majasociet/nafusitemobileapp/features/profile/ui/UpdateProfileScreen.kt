@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,115 +31,149 @@ import com.majasociet.nafusitemobileapp.shared.utils.ToastUtils
 import com.majasociet.nafusitemobileapp.ui.theme.AppTheme
 import kotlinx.coroutines.flow.collectLatest
 
+@Immutable
+data class UpdateProfileContentState(
+    val profileImageUrl: String,
+    val imagePreviewUrl: String?,
+    val firstName: String,
+    val lastName: String,
+    val isFormValid: Boolean,
+    val isLoading: Boolean,
+    val onChangeAvatar: () -> Unit,
+    val onFirstNameChange: (String) -> Unit,
+    val onLastNameChange: (String) -> Unit,
+    val onSave: () -> Unit
+)
+
+/**
+ * Stateful wrapper: reads state from ViewModel and maps to UI state.
+ * @param profileViewModel - profile view model
+ * @param navigateBack - navigate back
+ * @param navigateToSearch - navigate to search
+ */
 @Composable
 fun UpdateProfileScreen(
     profileViewModel: ProfileViewModel,
     navigateBack: () -> Unit,
     navigateToSearch: () -> Unit
-){
+) {
     val profileState = profileViewModel.profileState.collectAsStateWithLifecycle().value
+
     var firstName by remember { mutableStateOf(profileState.user?.firstName ?: "") }
     var lastName by remember { mutableStateOf(profileState.user?.lastName ?: "") }
+    var selectedImageUri by remember { mutableStateOf<String?>(null) }
 
     val isFormValid = firstName.isNotEmpty() && lastName.isNotEmpty()
 
-    var profileUrlImg by remember { mutableStateOf(profileState.user?.profileImgUrl) }
-    //This is image picked by user from gallery and one used to update profile image
-    var selectedImageUri by remember { mutableStateOf<String?>(null) }
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
-            if(uri != null){
+            if (uri != null) {
                 selectedImageUri = uri.toString()
             }
-
         }
     )
+
     val context = LocalContext.current
 
     LaunchedEffect(profileViewModel.profileEvent) {
-        profileViewModel.profileEvent.collectLatest {
-            event ->
-            when(event) {
-                is ProfileEvent.SuccessProfileUpdate ->{
+        profileViewModel.profileEvent.collectLatest { event ->
+            when (event) {
+                is ProfileEvent.SuccessProfileUpdate -> {
                     ToastUtils.show(context, "Profile updated successfully")
                 }
-                is ProfileEvent.FailureProfileUpdate ->{
+                is ProfileEvent.FailureProfileUpdate -> {
                     ToastUtils.show(context, event.message)
                 }
-
-                else -> {}
+                else -> Unit
             }
         }
-
-
     }
 
+    fun submit() {
+        val user = User(
+            id = profileState.user?.id ?: "",
+            email = profileState.user?.email ?: "",
+            firstName = firstName,
+            lastName = lastName,
+            dateOfBirth = profileState.user?.dateOfBirth ?: "",
+            preferences = profileState.user?.preferences ?: emptyList(),
+            profileImgUrl = profileState.user?.profileImgUrl
+        )
+        val imageUri = selectedImageUri?.let(Uri::parse)
+        profileViewModel.updateProfileWithImage(user = user, imageUri = imageUri)
+    }
+
+    val contentState = UpdateProfileContentState(
+        profileImageUrl = profileState.user?.profileImgUrl.orEmpty(),
+        imagePreviewUrl = selectedImageUri,
+        firstName = firstName,
+        lastName = lastName,
+        isFormValid = isFormValid,
+        isLoading = profileState.isLoading,
+        onChangeAvatar = {
+            photoPickerLauncher.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+            )
+        },
+        onFirstNameChange = { firstName = it },
+        onLastNameChange = { lastName = it },
+        onSave = ::submit
+    )
 
     ProfileScaffold(
         navigateBack = navigateBack,
         navigateToSearch = navigateToSearch,
+        content = {
+            UpdateProfileContent(state = contentState)
+        },
         bottomAction = {
             AppButton(
                 text = "Save",
-                disabled = !isFormValid,
-                isLoading = !isFormValid || profileState.isLoading,
+                disabled = !contentState.isFormValid,
+                isLoading = !contentState.isFormValid || contentState.isLoading,
                 modifier = Modifier.fillMaxWidth(),
-                onClick = {
-                   val user = User(
-                       id = profileState.user?.id ?: "",  // preserve existing ID
-                       email = profileState.user?.email ?: "",
-                       firstName = firstName,
-                       lastName = lastName,
-                       dateOfBirth = profileState.user?.dateOfBirth ?: "",
-                       preferences = profileState.user?.preferences ?: emptyList(),
-                       profileImgUrl = profileState.user?.profileImgUrl
-                   )
-                    val imageUri = selectedImageUri?.let { Uri.parse(it) }
-                    profileViewModel.updateProfileWithImage(user = user, imageUri = imageUri)
-
-                }
+                onClick = contentState.onSave
             )
-        },
-        content = {
-            Column(
-               modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium)
-            ){
-                ProfileAvatar(
-                    imageUrl = profileUrlImg ?: "",
-                    imagePreviewUrl = selectedImageUri,
-                    onChangeAvatar = {
-                        photoPickerLauncher.launch(
-                            PickVisualMediaRequest(
-                                ActivityResultContracts.PickVisualMedia.ImageOnly
-                            )
-                        )
-                    }
-                )
-                Spacer(
-                    modifier = Modifier.padding(AppTheme.spacing.medium)
-                )
-                CustomTextField(
-                    value = firstName,
-                    onValueChange = {
-                        firstName = it
-                    },
-                    label = "First Name",
-                    placeholder = "Enter your first name",
-                    error = ""
-                )
-                CustomTextField(
-                    value = lastName,
-                    onValueChange = {
-                        lastName = it
-                    },
-                    label = "Last Name",
-                    placeholder = "Enter your last name",
-                    error = ""
-                )
-            }
         }
     )
+}
+
+/**
+ * Stateless layout: only depends on provided state.
+ * @param state - update profile content state
+ */
+@Composable
+fun UpdateProfileContent(
+    state: UpdateProfileContentState
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium)
+    ) {
+        ProfileAvatar(
+            imageUrl = state.profileImageUrl,
+            imagePreviewUrl = state.imagePreviewUrl,
+            onChangeAvatar = state.onChangeAvatar
+        )
+
+        Spacer(modifier = Modifier.padding(AppTheme.spacing.medium))
+
+        CustomTextField(
+            value = state.firstName,
+            onValueChange = state.onFirstNameChange,
+            label = "First Name",
+            placeholder = "Enter your first name",
+            error = ""
+        )
+
+        CustomTextField(
+            value = state.lastName,
+            onValueChange = state.onLastNameChange,
+            label = "Last Name",
+            placeholder = "Enter your last name",
+            error = ""
+        )
+    }
 }

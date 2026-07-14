@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +38,27 @@ import com.majasociet.nafusitemobileapp.shared.utils.ValidationUtils
 import com.majasociet.nafusitemobileapp.ui.theme.AppTheme
 import kotlinx.coroutines.flow.collectLatest
 
+@Stable
+data class LoginScreenContentState(
+    val email: String,
+    val password: String,
+    val emailError: String,
+    val passwordError: String,
+    val isLoading: Boolean,
+    val isLogin: Boolean,
+    val isFormValid: Boolean,
+    val onEmailChange: (String) -> Unit,
+    val onPasswordChange: (String) -> Unit,
+    val onSubmit: () -> Unit,
+    val onNavigateRegistration: () -> Unit
+)
+
+/**
+ * Login screen
+ * @param authViewModel - auth view model
+ * @param profileViewModel - profile view model
+ * @param navigateRegistrationScreen - navigate to registration screen
+ */
 @Composable
 fun LoginScreen(
     authViewModel: AuthViewModel,
@@ -49,7 +71,6 @@ fun LoginScreen(
     var passwordError by remember { mutableStateOf("") }
 
     val isFormValid = email.isNotEmpty() && password.isNotEmpty()
-    val scrollState = rememberScrollState()
     val authState = authViewModel.authState.collectAsStateWithLifecycle().value
     val context = LocalContext.current
 
@@ -64,7 +85,7 @@ fun LoginScreen(
                     ToastUtils.show(context, "Login successful")
                     profileViewModel.getUserProfile(event.userId)
                 }
-                else -> {}
+                else -> Unit
             }
         }
     }
@@ -78,21 +99,52 @@ fun LoginScreen(
             emailError = "Invalid email address"
             return
         }
+
         authViewModel.loginUser(email, password)
     }
 
-    // 1. The Outer Box fills the screen space
+    val contentState = remember(
+        email,
+        password,
+        emailError,
+        passwordError,
+        authState.isLoading,
+        authState.isLogin,
+        isFormValid,
+        navigateRegistrationScreen
+    ) {
+        LoginScreenContentState(
+            email = email,
+            password = password,
+            emailError = emailError,
+            passwordError = passwordError,
+            isLoading = authState.isLoading,
+            isLogin = authState.isLogin,
+            isFormValid = isFormValid,
+            onEmailChange = { email = it },
+            onPasswordChange = { password = it },
+            onSubmit = ::submitForm,
+            onNavigateRegistration = navigateRegistrationScreen
+        )
+    }
+
+    LoginScreenContent(state = contentState)
+}
+
+@Composable
+fun LoginScreenContent(state: LoginScreenContentState) {
+    val scrollState = rememberScrollState()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(AppTheme.spacing.medium),
-        contentAlignment = Alignment.Center // Keeps the column centered when keyboard is closed
+        contentAlignment = Alignment.Center
     ) {
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(scrollState), // Handles the keyboard resize scaling perfectly
+                .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
@@ -102,40 +154,46 @@ fun LoginScreen(
                 contentScale = ContentScale.Fit
             )
 
-            Text("Verify your identity to login", style = MaterialTheme.typography.titleLarge)
+            Text(
+                text = "Verify your identity to login",
+                style = MaterialTheme.typography.titleLarge
+            )
             Spacer(modifier = Modifier.padding(AppTheme.spacing.medium))
 
             CustomTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = state.email,
+                onValueChange = state.onEmailChange,
                 label = "Email",
                 placeholder = "Enter your email address",
-                error = emailError
+                error = state.emailError
             )
+
             PasswordTextField(
-                value = password,
-                onValueChange = { password = it },
+                value = state.password,
+                onValueChange = state.onPasswordChange,
                 placeholder = "Enter your password",
-                error = passwordError
+                error = state.passwordError
             )
+
             Spacer(modifier = Modifier.padding(AppTheme.spacing.medium))
 
             AppButton(
                 modifier = Modifier.fillMaxWidth(),
-                isLoading = authState.isLoading,
-                disabled = !isFormValid && authState.isLogin,
+                isLoading = state.isLoading,
+                disabled = !state.isFormValid && state.isLogin,
                 text = "Login",
-                onClick = { submitForm() }
+                onClick = state.onSubmit
             )
+
             Spacer(modifier = Modifier.padding(AppTheme.spacing.small))
 
             AppButton(
                 modifier = Modifier.fillMaxWidth(),
-                isLoading = authState.isLoading,
-                disabled = !isFormValid && authState.isLogin,
+                isLoading = state.isLoading,
+                disabled = !state.isFormValid && state.isLogin,
                 text = "Register instead",
                 isOutlined = true,
-                onClick = { navigateRegistrationScreen() }
+                onClick = state.onNavigateRegistration
             )
         }
     }

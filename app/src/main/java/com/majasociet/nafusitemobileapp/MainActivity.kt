@@ -14,11 +14,11 @@ import com.majasociet.nafusitemobileapp.features.auth.data.repository.AuthReposi
 import com.majasociet.nafusitemobileapp.features.auth.ui.viewmodel.AuthViewModel
 import com.majasociet.nafusitemobileapp.features.products.data.repository.ProductsRepositoryImpl
 import com.majasociet.nafusitemobileapp.features.products.ui.viewmodel.ProductsViewModel
-import com.majasociet.nafusitemobileapp.features.profile.data.remote.network.RetrofitClient
 import com.majasociet.nafusitemobileapp.features.profile.data.repository.CloudinaryRepository
 import com.majasociet.nafusitemobileapp.features.profile.data.repository.ProfileRepositoryImpl
 import com.majasociet.nafusitemobileapp.features.profile.ui.viewmodel.ProfileViewModel
 import com.majasociet.nafusitemobileapp.navigation.AppNavHost
+import com.majasociet.nafusitemobileapp.shared.network.RetrofitClient
 import com.majasociet.nafusitemobileapp.ui.theme.NafusiteMobileAppTheme
 
 class MainActivity : ComponentActivity() {

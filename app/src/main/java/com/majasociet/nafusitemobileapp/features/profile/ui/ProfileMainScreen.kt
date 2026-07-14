@@ -16,6 +16,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,6 +31,18 @@ import com.majasociet.nafusitemobileapp.features.profile.ui.components.ProfileSc
 import com.majasociet.nafusitemobileapp.features.profile.ui.viewmodel.ProfileViewModel
 import com.majasociet.nafusitemobileapp.ui.theme.AppTheme
 
+@Immutable
+data class ProfileMainScreenContentState(
+    val profileImageUrl: String,
+    val firstName: String?,
+    val email: String?,
+    val onEditProfile: () -> Unit,
+    val onLogout: () -> Unit
+)
+
+/**
+ * Stateful wrapper: reads state from ViewModel and maps to UI state.
+ */
 @Composable
 fun ProfileMainScreen(
     navigateEditProfile: () -> Unit,
@@ -40,99 +53,115 @@ fun ProfileMainScreen(
 ) {
     val profileState = profileViewModel.profileState.collectAsStateWithLifecycle().value
     val user = profileState.user
+
+    val contentState = ProfileMainScreenContentState(
+        profileImageUrl = user?.profileImgUrl.orEmpty(),
+        firstName = user?.firstName,
+        email = user?.email,
+        onEditProfile = navigateEditProfile,
+        onLogout = logout
+    )
+
     ProfileScaffold(
         navigateBack = navigateBack,
         navigateToSearch = navigateToSearch,
         content = {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                ProfileAvatar(
-                    imageUrl = user?.profileImgUrl ?: ""
-                )
-                Spacer(
-                    modifier = Modifier.padding(AppTheme.spacing.medium)
-                )
-                user?.firstName?.let {
-                    Text(
-                        text = it,
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                }
-                user?.email?.let {
-                    Text(
-                        text = it
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(AppTheme.spacing.large))
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .background(
-                            color = Color(0xFFF1F1F1),
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                        .border(
-                            width = 2.dp,
-                            shape = RoundedCornerShape(12.dp),
-                            color = Color(0xFFF1F1F1)
-                        ),
-
-                    ) {
-                    Column(
-                        modifier = Modifier.fillMaxSize().padding(
-                            horizontal = AppTheme.spacing.small,
-                            vertical = AppTheme.spacing.medium
-                        ),
-                        verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium)
-                    ) {
-                        ProfileItem(
-                            icon = R.drawable.baseline_person_24,
-                            title = "Edit profile",
-                            action = {
-                                CaretIconButton(
-                                    onClick = navigateEditProfile
-                                )
-                            }
-                        )
-                        ProfileItem(
-                            icon = R.drawable.baseline_bedtime_24,
-                            title = "Dark mode",
-                            action = {
-                                //TODO: reusable switch
-                            }
-                        )
-                        ProfileItem(
-                            icon = R.drawable.baseline_exit_to_app_24,
-                            title = "Logout",
-                            action = {
-                                CaretIconButton(
-                                    onClick = logout
-                                )
-                            }
-                        )
-                    }
-
-
-                }
-            }
+            ProfileMainScreenContent(state = contentState)
         }
     )
-
 }
 
+/**
+ * Stateless layout: only depends on provided state.
+ * @param state - profile main screen content state
+ */
+@Composable
+fun ProfileMainScreenContent(
+    state: ProfileMainScreenContentState
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        ProfileAvatar(imageUrl = state.profileImageUrl)
+
+        Spacer(modifier = Modifier.padding(AppTheme.spacing.medium))
+
+        state.firstName?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold
+                )
+            )
+        }
+
+        state.email?.let {
+            Text(text = it)
+        }
+
+        Spacer(modifier = Modifier.height(AppTheme.spacing.large))
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .background(
+                    color = Color(0xFFF1F1F1),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .border(
+                    width = 2.dp,
+                    shape = RoundedCornerShape(12.dp),
+                    color = Color(0xFFF1F1F1)
+                ),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        horizontal = AppTheme.spacing.small,
+                        vertical = AppTheme.spacing.medium
+                    ),
+                verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium)
+            ) {
+                ProfileItem(
+                    icon = R.drawable.baseline_person_24,
+                    title = "Edit profile",
+                    action = {
+                        CaretIconButton(onClick = state.onEditProfile)
+                    }
+                )
+
+                ProfileItem(
+                    icon = R.drawable.baseline_bedtime_24,
+                    title = "Dark mode",
+                    action = {
+                        // TODO: reusable switch
+                    }
+                )
+
+                ProfileItem(
+                    icon = R.drawable.baseline_exit_to_app_24,
+                    title = "Logout",
+                    action = {
+                        CaretIconButton(onClick = state.onLogout)
+                    }
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Caret icon button
+ * @param onClick - on click
+ */
 @Composable
 fun CaretIconButton(
     onClick: () -> Unit
 ) {
-    IconButton(
-        onClick = onClick
-    ) {
+    IconButton(onClick = onClick) {
         Icon(
             painter = painterResource(R.drawable.arrow_forward_ios_24px),
             contentDescription = "Arrow Forward"

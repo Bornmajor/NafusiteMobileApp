@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.majasociet.nafusitemobileapp.features.profile.data.models.ProfileState
 import com.majasociet.nafusitemobileapp.features.profile.data.models.User
 import com.majasociet.nafusitemobileapp.features.profile.domain.repository.ProfileRepository
 import kotlinx.coroutines.flow.MutableSharedFlow

@@ -1,4 +1,4 @@
-package com.majasociet.nafusitemobileapp.features.profile.data.remote.network
+package com.majasociet.nafusitemobileapp.shared.network
 
 import com.majasociet.nafusitemobileapp.BuildConfig
 import com.majasociet.nafusitemobileapp.features.profile.data.remote.api.CloudinaryApiService
@@ -8,7 +8,6 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import kotlin.getValue
 
 object RetrofitClient {
 

@@ -32,6 +32,11 @@ import com.majasociet.nafusitemobileapp.features.auth.ui.components.CustomVideoP
 import com.majasociet.nafusitemobileapp.shared.components.AppButton
 import com.majasociet.nafusitemobileapp.ui.theme.AppTheme
 
+/**
+ * Welcome screen first screen registration journey.
+ * @param navigateRegistrationOnboarding - navigate to registration onboarding screen
+ * @param navigateLogin - navigate to login screen
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WelcomeRegistrationScreen (

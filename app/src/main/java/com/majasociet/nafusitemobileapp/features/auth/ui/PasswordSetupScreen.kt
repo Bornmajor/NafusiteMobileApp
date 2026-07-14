@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +26,23 @@ import com.majasociet.nafusitemobileapp.shared.utils.ValidationUtils
 import com.majasociet.nafusitemobileapp.ui.theme.AppTheme
 import kotlinx.coroutines.flow.collectLatest
 
+@Immutable
+data class PasswordSetupContentState(
+    val password: String,
+    val confirmPassword: String,
+    val passwordError: String,
+    val confirmPasswordError: String,
+    val onPasswordChange: (String) -> Unit,
+    val onConfirmPasswordChange: (String) -> Unit
+)
+
+/**
+ * Stateful wrapper: reads state from ViewModel and maps to UI state.
+ * @param basicInfo - basic registration info
+ * @param selectedPreferences - selected preferences
+ * @param authViewModel - auth view model
+ * @param navigateLogin - navigate to login screen
+ */
 @Composable
 fun PasswordSetupScreen(
     basicInfo: BasicRegistrationInfo,
@@ -37,15 +55,16 @@ fun PasswordSetupScreen(
 
     var passwordError by remember { mutableStateOf("") }
     var confirmPasswordError by remember { mutableStateOf("") }
-    val isFormValid = ValidationUtils.isValidPassword(password)
-            && password.isNotEmpty()
-            && password == confirmPassword
-            && confirmPassword.isNotEmpty()
+
+    val isFormValid = ValidationUtils.isValidPassword(password) &&
+            password.isNotEmpty() &&
+            password == confirmPassword &&
+            confirmPassword.isNotEmpty()
 
     val authState = authViewModel.authState.collectAsStateWithLifecycle().value
+    val context = LocalContext.current
 
-
-    fun submitPassword(){
+    fun submitPassword() {
         authViewModel.registerUser(
             email = basicInfo.email,
             password = password,
@@ -55,25 +74,25 @@ fun PasswordSetupScreen(
             selectedPreferences = selectedPreferences,
         )
     }
-    val context = LocalContext.current
 
-    LaunchedEffect(
-        authViewModel.uiEvent
-    ) {
+    LaunchedEffect(authViewModel.uiEvent) {
         authViewModel.uiEvent.collectLatest { event ->
-            when(event) {
-                is UIEvent.SubmitRegistrationSuccess ->{
-                    navigateLogin()
-                }
-                is UIEvent.SubmitRegistrationFailure ->{
-                    ToastUtils.show(context,event.message)
-                }
-                else -> {}
+            when (event) {
+                is UIEvent.SubmitRegistrationSuccess -> navigateLogin()
+                is UIEvent.SubmitRegistrationFailure -> ToastUtils.show(context, event.message)
+                else -> Unit
             }
         }
-
     }
 
+    val contentState = PasswordSetupContentState(
+        password = password,
+        confirmPassword = confirmPassword,
+        passwordError = passwordError,
+        confirmPasswordError = confirmPasswordError,
+        onPasswordChange = { password = it },
+        onConfirmPasswordChange = { confirmPassword = it }
+    )
 
     AuthOnboardingScaffold(
         currentStep = 3,
@@ -81,59 +100,67 @@ fun PasswordSetupScreen(
         isButtonLoading = authState.isLoading,
         canProceed = isFormValid,
         content = {
-            Column(
-                modifier = Modifier.padding(
-                    top = AppTheme.spacing.medium,
-                    bottom = AppTheme.spacing.medium
-                )
-            ) {
-                Text(
-                    "Complete your signup by creating a password",
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Spacer(modifier = Modifier.padding(AppTheme.spacing.small))
-                PasswordTextField(
-                    value = password,
-                    onValueChange = {
-                        password = it
-                    },
-                    placeholder = "New password",
-                    error = passwordError
-                )
-                PasswordTextField(
-                    value = confirmPassword,
-                    onValueChange = {
-                        confirmPassword = it
-                    },
-                    placeholder = "Confirm new password",
-                    error = confirmPasswordError
-                )
-
-                PasswordValidationBox(
-                    isChecked = password.length >= 8,
-                    label = "At least 8 characters"
-                )
-                PasswordValidationBox(
-                    isChecked = password.any { it.isUpperCase() || it.isLowerCase() },
-                    label = "At least uppercase and lowercase letter"
-                )
-                PasswordValidationBox(
-                    isChecked = password.any { it.isDigit() },
-                    label = "At least one number"
-                )
-                PasswordValidationBox(
-                    isChecked = password.any { !it.isLetterOrDigit() },
-                    label = "At least one special character"
-                )
-                PasswordValidationBox(
-                    isChecked = password.isNotEmpty()
-                            && confirmPassword.isNotEmpty()
-                            && password == confirmPassword,
-                    label = "Passwords match"
-                )
-
-            }
+            PasswordSetupContent(state = contentState)
         }
     )
+}
 
+/**
+ * Stateless layout: only depends on provided state.
+ * @param state - password setup content state
+ */
+@Composable
+fun PasswordSetupContent(
+    state: PasswordSetupContentState
+) {
+    Column(
+        modifier = Modifier.padding(
+            top = AppTheme.spacing.medium,
+            bottom = AppTheme.spacing.medium
+        )
+    ) {
+        Text(
+            text = "Complete your signup by creating a password",
+            style = MaterialTheme.typography.titleMedium
+        )
+
+        Spacer(modifier = Modifier.padding(AppTheme.spacing.small))
+
+        PasswordTextField(
+            value = state.password,
+            onValueChange = state.onPasswordChange,
+            placeholder = "New password",
+            error = state.passwordError
+        )
+
+        PasswordTextField(
+            value = state.confirmPassword,
+            onValueChange = state.onConfirmPasswordChange,
+            placeholder = "Confirm new password",
+            error = state.confirmPasswordError
+        )
+
+        PasswordValidationBox(
+            isChecked = state.password.length >= 8,
+            label = "At least 8 characters"
+        )
+        PasswordValidationBox(
+            isChecked = state.password.any { it.isUpperCase() || it.isLowerCase() },
+            label = "At least uppercase and lowercase letter"
+        )
+        PasswordValidationBox(
+            isChecked = state.password.any { it.isDigit() },
+            label = "At least one number"
+        )
+        PasswordValidationBox(
+            isChecked = state.password.any { !it.isLetterOrDigit() },
+            label = "At least one special character"
+        )
+        PasswordValidationBox(
+            isChecked = state.password.isNotEmpty() &&
+                    state.confirmPassword.isNotEmpty() &&
+                    state.password == state.confirmPassword,
+            label = "Passwords match"
+        )
+    }
 }

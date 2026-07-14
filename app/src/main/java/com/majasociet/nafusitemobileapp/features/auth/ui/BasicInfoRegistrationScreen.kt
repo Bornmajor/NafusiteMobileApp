@@ -18,6 +18,10 @@ import com.majasociet.nafusitemobileapp.shared.components.CustomTextField
 import com.majasociet.nafusitemobileapp.shared.utils.ValidationUtils
 import com.majasociet.nafusitemobileapp.ui.theme.AppTheme
 
+/**
+ * User enters basic Info  during registration journey.
+ * @param onNextClick - on next click
+ */
 @Composable
 fun BasicInfoRegistrationScreen(
     onNextClick:(BasicRegistrationInfo) -> Unit,

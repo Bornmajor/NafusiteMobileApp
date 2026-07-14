@@ -34,6 +34,11 @@ import com.majasociet.nafusitemobileapp.R
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 
+/**
+ * Custom Video Player
+ * @param localVideoUri - local video uri
+ * @param modifier - modifier
+ */
 @OptIn(UnstableApi::class)
 @Composable
 fun CustomVideoPlayer(

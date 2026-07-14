@@ -16,6 +16,10 @@ import com.majasociet.nafusitemobileapp.features.auth.ui.components.AuthOnboardi
 import com.majasociet.nafusitemobileapp.shared.components.MultiSelectPillGroup
 import com.majasociet.nafusitemobileapp.ui.theme.AppTheme
 
+/**
+ * Screen in registration journey where user selects their preferences.
+ * @param onPreferenceConfirm - on preference confirm
+ */
 @Composable
 fun UserPreferenceSelectionScreen(
     onPreferenceConfirm:(List<String>) -> Unit

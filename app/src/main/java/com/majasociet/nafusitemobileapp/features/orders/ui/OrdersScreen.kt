@@ -13,6 +13,11 @@ import com.majasociet.nafusitemobileapp.shared.components.AppButton
 import com.majasociet.nafusitemobileapp.shared.components.BottomTabScreenScaffold
 import com.majasociet.nafusitemobileapp.ui.theme.AppTheme
 
+/**
+ * Main Order Screen from BottomNavigation
+ * @param navigateToSearch - navigate to search screen
+ * @param navigateToProfile - navigate to profile screen
+ */
 @Composable
 fun OrdersScreen(
     navigateToSearch:()-> Unit,

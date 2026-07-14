@@ -1,0 +1,6 @@
+projectKey=NafusiteMobileApp
+serverUrl=http://localhost:9000
+serverVersion=26.6.0.123539
+dashboardUrl=http://localhost:9000/dashboard?id=NafusiteMobileApp
+ceTaskId=d5e4d234-6701-4f55-956d-f75f63b5a294
+ceTaskUrl=http://localhost:9000/api/ce/task?id=d5e4d234-6701-4f55-956d-f75f63b5a294
