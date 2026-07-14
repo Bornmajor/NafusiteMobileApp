@@ -1,0 +1,25 @@
+naming:
+  FunctionNaming:
+    active: true
+    # Allows PascalCase for @Composable functions that return Unit
+    ignoreAnnotated: ['Composable']
+
+complexity:
+  LongParameterList:
+    active: true
+    # Jetpack Compose functions naturally have many optional parameters
+    ignoreDefaultParameters: true
+
+# Enable the custom Compose Ruleset
+Compose:
+  active: true
+  ComposeNamingArguments:
+    active: true
+  ComposeModifierMissing:
+    active: true
+  ComposeMultipleContentEmitters:
+    active: true
+  ComposeMutableStateAutoboxing:
+    active: true
+  ComposeViewModelInjection:
+    active: true

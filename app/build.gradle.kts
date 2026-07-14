@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
     id("org.jetbrains.kotlin.plugin.serialization")
+    id("io.gitlab.arturbosch.detekt") version "1.23.8"
 }
 
 android {
@@ -67,7 +68,7 @@ android {
 }
 
 dependencies {
-
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.8")
     implementation("com.jakewharton.timber:timber:5.0.1")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     //Network calls
