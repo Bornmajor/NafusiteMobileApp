@@ -1,7 +1,8 @@
 package com.majasociet.nafusitemobileapp.features.products.ui.viewmodel
 
-import com.majasociet.nafusitemobileapp.features.products.domain.models.Category
-import com.majasociet.nafusitemobileapp.features.products.domain.models.Product
+import com.majasociet.nafusitemobileapp.features.products.data.models.Category
+import com.majasociet.nafusitemobileapp.features.products.data.models.Product
+
 
 /**
  * UI State for the Products/Home screens.

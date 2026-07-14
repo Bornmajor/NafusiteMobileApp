@@ -2,7 +2,6 @@ package com.majasociet.nafusitemobileapp.features.auth.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.majasociet.nafusitemobileapp.features.auth.data.models.AuthState
 import com.majasociet.nafusitemobileapp.features.auth.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

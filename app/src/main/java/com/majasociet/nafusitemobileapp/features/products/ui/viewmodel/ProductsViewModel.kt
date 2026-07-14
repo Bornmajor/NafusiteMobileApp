@@ -1,9 +1,7 @@
 package com.majasociet.nafusitemobileapp.features.products.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
-import com.majasociet.nafusitemobileapp.features.products.data.models.ProductsState
 import com.majasociet.nafusitemobileapp.features.products.domain.repository.ProductsRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow

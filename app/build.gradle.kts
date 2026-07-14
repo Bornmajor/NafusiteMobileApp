@@ -4,9 +4,9 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    id("com.google.gms.google-services")
-    id("org.jetbrains.kotlin.plugin.serialization")
-    id("io.gitlab.arturbosch.detekt") version "1.23.8"
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.detekt)
 }
 
 android {
@@ -68,30 +68,31 @@ android {
 }
 
 dependencies {
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.8")
-    implementation("com.jakewharton.timber:timber:5.0.1")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-    //Network calls
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    //Json to Kotlin object mapping
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("io.coil-kt.coil3:coil-compose:3.5.0")
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.5.0")
-    implementation("androidx.compose.material3:material3-adaptive-navigation-suite")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-    // THIS FOR SECURITY & AUTHENTICATION
-    implementation("com.google.firebase:firebase-auth")
-    // Realtime Database library
-    implementation("com.google.firebase:firebase-database")
-    implementation(platform("com.google.firebase:firebase-bom:34.15.0"))
-    implementation("androidx.media3:media3-exoplayer:1.10.1")
-    implementation("androidx.media3:media3-exoplayer-dash:1.10.1")
-    implementation("androidx.media3:media3-ui:1.10.1")
-    implementation("androidx.media3:media3-ui-compose-material3:1.10.1")
-    implementation("androidx.navigation:navigation-compose:2.9.8")
-    implementation("com.github.OCNYang.Compose-SpinKit:library:1.0.5") {
+    detektPlugins(libs.detekt.formatting)
+
+    implementation(libs.timber)
+    implementation(libs.okhttp3.logging.interceptor)
+    implementation(libs.retrofit2.retrofit)
+    implementation(libs.retrofit2.converter.gson)
+    implementation(libs.coil3.compose)
+    implementation(libs.coil3.network.okhttp)
+    implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
+    implementation(libs.kotlinx.serialization.json)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.database)
+
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.exoplayer.dash)
+    implementation(libs.androidx.media3.ui)
+    implementation(libs.androidx.media3.ui.compose.material3)
+    implementation(libs.androidx.navigation.compose)
+
+    implementation(libs.compose.spinkit) {
         exclude("com.github.jitpack")
     }
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
@@ -100,11 +101,16 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.mockk)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }

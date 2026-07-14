@@ -1,35 +1,23 @@
 package com.majasociet.nafusitemobileapp.features.home.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.majasociet.nafusitemobileapp.features.auth.ui.viewmodel.AuthViewModel
 import com.majasociet.nafusitemobileapp.features.home.ui.components.CategoryGroup
 import com.majasociet.nafusitemobileapp.features.home.ui.components.HorizontalScrollableCategory
 import com.majasociet.nafusitemobileapp.features.products.data.models.Category
-import com.majasociet.nafusitemobileapp.features.products.data.models.Product
-import com.majasociet.nafusitemobileapp.features.products.ui.viewmodel.ProductsEvent
+import com.majasociet.nafusitemobileapp.features.products.ui.viewmodel.ProductsState
 import com.majasociet.nafusitemobileapp.features.products.ui.viewmodel.ProductsViewModel
 import com.majasociet.nafusitemobileapp.shared.components.AppLoaderUI
 import com.majasociet.nafusitemobileapp.shared.components.BottomTabScreenScaffold
 import com.majasociet.nafusitemobileapp.shared.components.ErrorMessage
-import com.majasociet.nafusitemobileapp.shared.constants.AppConstants
-import com.majasociet.nafusitemobileapp.shared.utils.ToastUtils
 import com.majasociet.nafusitemobileapp.ui.theme.AppTheme
-import kotlinx.coroutines.flow.collectLatest
-
-
 
 @Composable
 fun HomeScreen(
@@ -38,73 +26,67 @@ fun HomeScreen(
     navigateToSearch: () -> Unit,
     navigateToCategory: (Category) -> Unit,
     productsViewModel: ProductsViewModel
-){
-
-    val productsState = productsViewModel.productsState.collectAsStateWithLifecycle().value;
-
-//    LaunchedEffect(productsViewModel.productEvent) {
-//        productsViewModel.productEvent.collectLatest { event ->
-//            when (event) {
-//                is ProductsEvent.FailureFetchCategories -> {
-//                    // Handle failure
-//                    ToastUtils.show(context, event.message)
-//                }
-//                is ProductsEvent.FailureFetchProducts -> {
-//                    // Handle failure
-//                    ToastUtils.show(context, event.message)
-//                }
-//
-//                }
-//
-//            }
-//    }
+) {
+    val productsState = productsViewModel.productsState.collectAsStateWithLifecycle().value
 
     BottomTabScreenScaffold(
         navigateToProfile = navigateToProfile,
-        navigateToSearch = navigateToSearch,
-        content = {
+        navigateToSearch = navigateToSearch
+    ) {
+        HomeScreenContent(
+            state = productsState,
+            navigateToCategory = navigateToCategory
+        )
+    }
+}
 
-            if(productsState.isLoading){
+@Composable
+fun HomeScreenContent(
+    state: ProductsState,
+    navigateToCategory: (Category) -> Unit
+) {
+    when {
+        state.isLoading -> {
+            AppLoaderUI(
+                modifier = Modifier.fillMaxSize(),
+                message = "Loading content..."
+            )
+        }
 
-                AppLoaderUI(
-                    modifier = Modifier.fillMaxSize(),
-                    message = "Loading content..."
-                )
-            } else if(productsState.error != null){
-                ErrorMessage(
-                    modifier = Modifier.fillMaxSize(),
-                    message = productsState.error
-                )
-            } else {
-                LazyColumn (
-                    modifier = Modifier.fillMaxSize().padding(AppTheme.spacing.medium),
-                    verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
-                ){
-                    item{
-                        HorizontalScrollableCategory(
-                            categories = productsState.categories,
-                            onSelectCategory = navigateToCategory
-                        )
-                    }
+        state.error != null -> {
+            ErrorMessage(
+                modifier = Modifier.fillMaxSize(),
+                message = state.error
+            )
+        }
 
-                    items(productsState.categories){
-                            category ->
-                        CategoryGroup(
-                            title = category.title,
-                            products = productsState.products.filter { it.category == category.id },
-                            onSelectProduct = {
-                                //Navigate to product detail screen
-                            },
-                            onExpandCategory = {
-                                //Navigate to category screen
-                            }
-                        )
-                    }
+        else -> {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(AppTheme.spacing.medium),
+                verticalArrangement = Arrangement.spacedBy(AppTheme.spacing.medium),
+            ) {
+                item {
+                    HorizontalScrollableCategory(
+                        categories = state.categories,
+                        onSelectCategory = navigateToCategory
+                    )
+                }
+
+                items(state.categories) { category ->
+                    CategoryGroup(
+                        title = category.title,
+                        products = state.products.filter { it.category == category.id },
+                        onSelectProduct = {
+                            // Navigate to product detail screen
+                        },
+                        onExpandCategory = {
+                            // Navigate to category screen
+                        }
+                    )
                 }
             }
-
         }
-    )
-
-
+    }
 }

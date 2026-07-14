@@ -8,22 +8,40 @@ Designed specifically for the Kenyan audience, Nafusite integrates local prefere
 ## ✨ Features
 
 - **Product Showcase**: High-resolution image galleries and video previews for each jewelry piece.
-- **Modern UI/UX**: Clean, elegant interface built with Jetpack Compose.
-- **Custom Video Player**: Experience jewelry in motion with our integrated video components.
-- **Shopping Cart**: Easily manage your favorite items and proceed to checkout.
-- **Secure Authentication**: User accounts to track orders and save wishlists.
-- **Localized Payments**: Support for Kenyan payment methods including M-PESA (Planned/Integrated).
+- **Modern UI/UX**: Clean, elegant interface built with Jetpack Compose using Material 3.
+- **Custom Video Player**: Experience jewelry in motion with integrated video components powered by Media3.
+- **Real-time Catalog**: Browse products and categories fetched in real-time from Firebase.
+- **Profile Management**: Update user details and upload profile pictures via Cloudinary integration.
+- **Onboarding Journey**: Personalized registration flow including product preference selection.
+- **Secure Authentication**: Firebase-backed authentication for user accounts and data persistence.
+- **Localized Payments**: Support for Kenyan payment methods including M-PESA (Planned).
 - **Dark Mode Support**: Full compatibility with system-wide dark and light themes.
 
 ## 🛠 Tech Stack
 
 - **Language**: [Kotlin](https://kotlinlang.org/)
 - **UI Framework**: [Jetpack Compose](https://developer.android.com/jetpack/compose)
-- **Architecture**: MVVM (Model-View-ViewModel)
+- **Architecture**: MVVM (Model-View-ViewModel) with Unidirectional Data Flow.
+- **Backend**: [Firebase](https://firebase.google.com/) (Auth & Realtime Database)
+- **Image Hosting**: [Cloudinary](https://cloudinary.com/) for dynamic profile image management.
 - **Media**: [Media3 ExoPlayer](https://developer.android.com/guide/topics/media/exoplayer) for high-quality video playback.
-- **Navigation**: Compose Navigation
-- **Dependency Injection**: Hilt (if applicable) / Standard Kotlin patterns
-- **UI Components**: Material 3
+- **Navigation**: Type-safe Navigation Compose.
+- **Testing**: JUnit 4, MockK, Turbine (Flow testing), and Compose UI Testing.
+- **Dependency Management**: Version Catalog (libs.versions.toml).
+
+## 🏗 Architecture
+
+Nafusite follows a clean **MVVM + UDF (Unidirectional Data Flow)** approach.
+
+### Data Flow (State In, Event Out)
+1. **State In**: Compose screens subscribe to ViewModel state flows using `collectAsStateWithLifecycle()`.
+2. **Event Out**: UI sends interactions (clicks, text input) back to the ViewModel.
+3. **One-off Events**: Navigation and Toasts are handled via `SharedFlow` observed in `LaunchedEffect`.
+
+### Testing Strategy
+The project maintains a high standard of reliability with:
+- **Unit Tests**: Coverage for ViewModels and Repositories using MockK and Turbine.
+- **UI Tests**: Instrumented tests for critical user flows like Registration and Login.
 
 ## 🚀 Getting Started
 
@@ -32,25 +50,29 @@ Designed specifically for the Kenyan audience, Nafusite integrates local prefere
 - JDK 17
 - Android SDK 24+ (Android 7.0+)
 
-### Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/NafusiteMobileApp.git
+### Setup
+1. Clone the repository.
+2. Add your Cloudinary credentials to `local.properties`:
+   ```properties
+   CLOUDINARY_API_KEY=your_api_key
+   CLOUDINARY_API_SECRET=your_api_secret
    ```
-2. Open the project in Android Studio.
-3. Sync Project with Gradle Files.
-4. Run the app on an emulator or physical device.
+3. Connect your Firebase project and add `google-services.json` to the `app/` folder.
+4. Sync Gradle and Run.
 
 ## 📁 Project Structure
 
 ```text
 com.majasociet.nafusitemobileapp
 ├── features
-│   ├── auth          # Authentication logic and UI
-│   ├── home          # Main landing screens
-│   └── (others)      # Shop, Cart, Profile
-├── ui.theme          # Material3 Theme and Color definitions
-└── core              # Shared components and utilities
+│   ├── auth          # Registration, Login, and Preference selection
+│   ├── products      # Catalog, Categories, and Product details
+│   ├── profile       # Profile settings and Image uploads
+│   ├── home          # Dashboard and personalized highlights
+│   └── carts         # Shopping cart and checkout flow
+├── shared            # Reusable UI components, Utils, and Network clients
+├── navigation        # Type-safe navigation graphs and screen definitions
+└── ui.theme          # Material3 Theme, Typography, and Design tokens
 ```
 
 ## 💳 Payments in Kenya

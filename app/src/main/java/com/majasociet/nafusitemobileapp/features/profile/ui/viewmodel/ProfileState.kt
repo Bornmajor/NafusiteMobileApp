@@ -1,6 +1,7 @@
 package com.majasociet.nafusitemobileapp.features.profile.ui.viewmodel
 
-import com.majasociet.nafusitemobileapp.features.profile.domain.models.User
+import com.majasociet.nafusitemobileapp.features.profile.data.models.User
+
 
 /**
  * UI State for the profile screen.
@@ -8,5 +9,5 @@ import com.majasociet.nafusitemobileapp.features.profile.domain.models.User
 data class ProfileState(
     val isLoading: Boolean = false,
     val user: User? = null,
-    val error: String? = null
+    val error: String?
 )
